@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Gabriely Princesa ✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffcce6, #d9b3ff, #b3e6ff);
+            font-family: 'Comic Sans MS', 'Arial Rounded M T Bold', cursive;
+            touch-action: manipulation;
+        }
+        
+        #game-container {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #70c5ce 0%, #96d1e4 100%);
+        }
+        
+        #bird {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            left: 100px;
+            top: 50vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 10;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.8);
+            transform: rotate(0deg);
+            transition: transform 0.2s;
+        }
+        
+        .pipe {
+            position: absolute;
+            width: 100px;
+            background: linear-gradient(to bottom, #5cb85c 0%, #8fd18f 100%);
+            right: -100px;
+            z-index: 5;
+            border: 3px solid #3d8b3d;
+            border-radius: 15px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+        }
+        
+        #top-pipe {
+            top: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        #bottom-pipe {
+            bottom: 100px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+        
+        #ground {
+            position: absolute;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to right, #de9a4b 0%, #e8b474 50%, #de9a4b 100%);
+            bottom: 0;
+            z-index: 5;
+            border-top: 5px solid #b57a28;
+        }
+        
+        #score {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff1493;
+            text-shadow: 3px 3px 0 #fff, 
+                         -1px -1px 0 #fff, 
+                         1px -1px 0 #fff, 
+                         -1px 1px 0 #fff, 
+                         1px 1px 0 #fff;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
+        }
+        
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff1493;
+            text-shadow: 3px 3px 0 #fff, 
+                        -1px -1px 0 #fff, 
+                        1px -1px 0 #fff, 
+                        -1px 1px 0 #fff, 
+                        1px 1px 0 #fff;
+            display: none;
+            text-align: center;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.7);
+            border: 5px dotted #ff69b4;
+        }
+        
+        #restart {
+            margin-top: 30px;
+            padding: 12px 30px;
+            font-size: 24px;
+            background: linear-gradient(to bottom, #ff69b4 0%, #ff1493 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+            transition: all 0.3s;
+        }
+        
+        #restart:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+        
+        .princess-text {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff1493;
+            text-shadow: 2px 2px 0 #fff, 
+                        -1px -1px 0 #fff, 
+                        1px -1px 0 #fff, 
+                        -1px 1px 0 #fff;
+            z-index: 1;
+            animation: float 4s infinite ease-in-out;
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-25px) rotate(5deg); }
+        }
+        
+        .hearts {
+            position: absolute;
+            font-size: 20px;
+            color: #ff1493;
+            z-index: 2;
+            animation: fall 8s linear infinite;
+        }
+        
+        @keyframes fall {
+            to { top: 100vh; }
+        }
+        
+        #title {
+            position: absolute;
+            top: 30px;
+            width: 100%;
+            text-align: center;
+            font-size: 60px;
+            font-weight: bold;
+            color: #ff1493;
+            text-shadow: 3px 3px 0 #fff, 
+                        -2px -2px 0 #fff, 
+                        2px -2px 0 #fff, 
+                        -2px 2px 0 #fff, 
+                        2px 2px 0 #fff;
+            z-index: 10;
+            animation: pulse 2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        
+        #music-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        #music-control img {
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Player de música adicionado aqui -->
+    <audio id="background-music" loop>
+        <source src="eloah.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div id="music-control" title="Play/Pause">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bS0xIDE0aC0ydi04aDJ2OHptNCAwaC0ydi04aDJ2OHoiLz48L3N2Zz4=" alt="Música">
+    </div>
+
+    <div id="game-container">
+        <div id="title">✨ eloah princesa ✨</div>
+        <div id="bird"></div>
+        <div id="top-pipe" class="pipe"></div>
+        <div id="bottom-pipe" class="pipe"></div>
+        <div id="ground"></div>
+        <div id="score">0</div>
+        <div id="game-over">
+            ta com delay amor? 💖
+            <button id="restart">Tenta dinovo princesa</button>
+        </div>
+    </div>
+
+    <script>
+        // Configurações do jogo
+        const config = {
+            gravity: 0.5,
+            jumpForce: -12,
+            speed: 4,
+            pipeGap: 200,
+            pipeWidth: 100,
+            birdWidth: 50,
+            birdHeight: 50,
+            birdX: 100,
+            groundHeight: 100
+        };
+
+        // Elementos do jogo
+        const gameContainer = document.getElementById('game-container');
+        const bird = document.getElementById('bird');
+        const topPipe = document.getElementById('top-pipe');
+        const bottomPipe = document.getElementById('bottom-pipe');
+        const ground = document.getElementById('ground');
+        const scoreElement = document.getElementById('score');
+        const gameOverElement = document.getElementById('game-over');
+        const restartButton = document.getElementById('restart');
+        const titleElement = document.getElementById('title');
+        const backgroundMusic = document.getElementById('background-music');
+        const musicControl = document.getElementById('music-control');
+
+        // Variáveis do jogo
+        let birdY = window.innerHeight / 2;
+        let velocity = 0;
+        let pipeX = window.innerWidth;
+        let topPipeHeight;
+        let score = 0;
+        let gameRunning = true;
+        let animationId;
+        let rotation = 0;
+        let musicPlaying = false;
+        
+        // Configura a imagem do pássaro
+        bird.style.backgroundImage = "url('1000038343.png')";
+        bird.style.backgroundColor = "transparent";
+
+        // Controle de música
+        function toggleMusic() {
+            if (musicPlaying) {
+                backgroundMusic.pause();
+                musicPlaying = false;
+                musicControl.innerHTML = '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bS0yIDE0aC0ydi04aDJ2OHptNiAwaC0ydi04aDJ2OHoiLz48L3N2Zz4=" alt="Música">';
+            } else {
+                backgroundMusic.play();
+                backgroundMusic.volume = 0.3;
+                musicPlaying = true;
+                musicControl.innerHTML = '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bS0xIDE0aC0ydi04aDJ2OHptNCAwaC0ydi04aDJ2OHoiLz48L3N2Zz4=" alt="Música">';
+            }
+        }
+
+        musicControl.addEventListener('click', toggleMusic);
+
+        // Cria textos flutuantes
+        function createFloatingTexts() {
+            const colors = ['#ff1493', '#ff69b4', '#ff00ff', '#dda0dd', '#ba55d3'];
+            const texts = ['eloah princesa', '💖', '✨', '🌸', '💕'];
+            
+            for (let i = 0; i < 20; i++) {
+                const text = document.createElement('div');
+                text.className = 'princess-text';
+                text.textContent = texts[Math.floor(Math.random() * texts.length)];
+                text.style.left = `${Math.random() * window.innerWidth}px`;
+                text.style.top = `${Math.random() * window.innerHeight}px`;
+                text.style.color = colors[Math.floor(Math.random() * colors.length)];
+                text.style.fontSize = `${Math.random() * 24 + 18}px`;
+                text.style.animationDuration = `${Math.random() * 5 + 3}s`;
+                text.style.animationDelay = `${Math.random() * 2}s`;
+                gameContainer.appendChild(text);
+            }
+        }
+
+        // Cria corações caindo
+        function createHearts() {
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'hearts';
+                heart.innerHTML = '💖';
+                heart.style.left = `${Math.random() * window.innerWidth}px`;
+                heart.style.top = '-40px';
+                heart.style.fontSize = `${Math.random() * 24 + 16}px`;
+                heart.style.animationDuration = `${Math.random() * 4 + 4}s`;
+                gameContainer.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 9000);
+            }, 400);
+        }
+
+        // Inicializa os canos
+        function resetPipes() {
+            pipeX = window.innerWidth;
+            topPipeHeight = Math.random() * (window.innerHeight - config.pipeGap - 200) + 50;
+            topPipe.style.height = `${topPipeHeight}px`;
+            bottomPipe.style.height = `${window.innerHeight - topPipeHeight - config.pipeGap - config.groundHeight}px`;
+            bottomPipe.style.top = `${topPipeHeight + config.pipeGap}px`;
+        }
+
+        // Atualiza a posição do pássaro
+        function updateBird() {
+            velocity += config.gravity;
+            birdY += velocity;
+            
+            rotation = Math.min(Math.max(velocity * 3, -30), 30);
+            bird.style.transform = `rotate(${rotation}deg)`;
+            
+            bird.style.top = `${birdY}px`;
+            
+            if (birdY + config.birdHeight > window.innerHeight - config.groundHeight || birdY < 0) {
+                endGame();
+            }
+        }
+
+        // Atualiza os canos
+        function updatePipes() {
+            pipeX -= config.speed;
+            topPipe.style.right = `${window.innerWidth - pipeX - config.pipeWidth}px`;
+            bottomPipe.style.right = `${window.innerWidth - pipeX - config.pipeWidth}px`;
+            
+            if (pipeX + config.pipeWidth < config.birdX && pipeX + config.pipeWidth > config.birdX - config.speed) {
+                score++;
+                scoreElement.textContent = score;
+                
+                scoreElement.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    scoreElement.style.transform = 'scale(1)';
+                }, 200);
+            }
+            
+            if (
+                config.birdX + config.birdWidth > pipeX && 
+                config.birdX < pipeX + config.pipeWidth && 
+                (birdY < topPipeHeight || birdY + config.birdHeight > topPipeHeight + config.pipeGap)
+            ) {
+                endGame();
+            }
+            
+            if (pipeX < -config.pipeWidth) {
+                resetPipes();
+            }
+        }
+
+        // Finaliza o jogo
+        function endGame() {
+            gameRunning = false;
+            gameOverElement.style.display = 'block';
+            titleElement.style.display = 'block';
+            cancelAnimationFrame(animationId);
+            bird.style.transform = 'rotate(90deg)';
+        }
+
+        // Reinicia o jogo
+        function restartGame() {
+            document.querySelectorAll('.princess-text').forEach(el => el.remove());
+            
+            birdY = window.innerHeight / 2;
+            velocity = 0;
+            score = 0;
+            scoreElement.textContent = score;
+            gameRunning = true;
+            gameOverElement.style.display = 'none';
+            titleElement.style.display = 'none';
+            bird.style.transform = 'rotate(0deg)';
+            
+            // Inicia a música ao reiniciar
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play();
+            backgroundMusic.volume = 0.3;
+            musicPlaying = true;
+            
+            createFloatingTexts();
+            resetPipes();
+            gameLoop();
+        }
+
+        // Ajusta o tamanho do jogo
+        function resizeGame() {
+            const gameHeight = window.innerHeight;
+            const gameWidth = window.innerWidth;
+            
+            gameContainer.style.width = `${gameWidth}px`;
+            gameContainer.style.height = `${gameHeight}px`;
+            
+            resetPipes();
+        }
+
+        // Loop principal do jogo
+        function gameLoop() {
+            if (gameRunning) {
+                updateBird();
+                updatePipes();
+                animationId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.code === 'ArrowUp') && gameRunning) {
+                velocity = config.jumpForce;
+                bird.style.transform = 'rotate(-20deg)';
+            }
+            
+            if (e.code === 'KeyR' && !gameRunning) {
+                restartGame();
+            }
+        });
+
+        gameContainer.addEventListener('click', () => {
+            if (gameRunning) {
+                velocity = config.jumpForce;
+                bird.style.transform = 'rotate(-20deg)';
+            } else {
+                restartGame();
+            }
+        });
+
+        gameContainer.addEventListener('touchstart', () => {
+            if (gameRunning) {
+                velocity = config.jumpForce;
+                bird.style.transform = 'rotate(-20deg)';
+            } else {
+                restartGame();
+            }
+        });
+
+        window.addEventListener('resize', resizeGame);
+        restartButton.addEventListener('click', restartGame);
+
+        // Inicia o jogo
+        createFloatingTexts();
+        createHearts();
+        resizeGame();
+        titleElement.style.display = 'none';
+        restartGame();
+    </script>
+</body>
+</html>
